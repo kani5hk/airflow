@@ -105,6 +105,7 @@ if you may.
 
 Currently **officially** using Airflow:
 
+1. [4G Capital](http://www.4g-capital.com/) [[@posei](https://github.com/posei)]
 1. [6play](https://www.6play.fr) [[@lemourA](https://github.com/lemoura), [@achaussende](https://github.com/achaussende), [@d-nguyen](https://github.com/d-nguyen), [@julien-gm](https://github.com/julien-gm)]
 1. [8fit](https://8fit.com/) [[@nicor88](https://github.com/nicor88), [@frnzska](https://github.com/frnzska)]
 1. [90 Seconds](https://90seconds.tv/) [[@aaronmak](https://github.com/aaronmak)]
@@ -163,6 +164,7 @@ Currently **officially** using Airflow:
 1. [City of San Diego](http://sandiego.gov) [[@MrMaksimize](https://github.com/mrmaksimize), [@andrell81](https://github.com/andrell81) & [@arnaudvedy](https://github.com/arnaudvedy)]
 1. [Civey](https://civey.com/) [[@WesleyBatista](https://github.com/WesleyBatista)]
 1. [Clairvoyant](https://clairvoyantsoft.com) [@shekharv](https://github.com/shekharv)
+1. [Classmethod, Inc.](https://classmethod.jp/) [[@shoito](https://github.com/shoito)]
 1. [Clover Health](https://www.cloverhealth.com) [[@gwax](https://github.com/gwax) & [@vansivallab](https://github.com/vansivallab)]
 1. [Collectivehealth Inc.](https://www.collectivehealth.com) [@retornam](https://github.com/retornam)
 1. [Compass](https://www.compass.com) [[@wdhorton](https://github.com/wdhorton)]
@@ -200,9 +202,10 @@ Currently **officially** using Airflow:
 1. [GeneCards](https://www.genecards.org) [[@oferze](https://github.com/oferze)]
 1. [Gentner Lab](http://github.com/gentnerlab) [[@neuromusic](https://github.com/neuromusic)]
 1. [Get Simpl](https://getsimpl.com/) [[@rootcss](https://github.com/rootcss)]
+1. [GitLab](https://about.gitlab.com/) [[@tlapiana](https://gitlab.com/tlapiana) & [@tayloramurphy](https://gitlab.com/tayloramurphy)]
 1. [Glassdoor](https://github.com/Glassdoor) [[@syvineckruyk](https://github.com/syvineckruyk) & [@sid88in](https://github.com/sid88in)]
 1. [Global Fashion Group](http://global-fashion-group.com) [[@GFG](https://github.com/GFG)]
-1. [GoDataDriven](https://godatadriven.com/) [[@BasPH](https://github.com/basph), [@ffinfo](https://github.com/ffinfo), [@Fokko](https://github.com/Fokko), [@gglanzani](https://github.com/gglanzani), [@hgrif](https://github.com/hgrif), [@jrderuiter](https://github.com/jrderuiter) [@NielsZeilemaker](https://github.com/NielsZeilemaker)]
+1. [GoDataDriven](https://godatadriven.com/) [[@BasPH](https://github.com/basph), [@danielvdende](https://github.com/danielvdende), [@ffinfo](https://github.com/ffinfo), [@Fokko](https://github.com/Fokko), [@gglanzani](https://github.com/gglanzani), [@hgrif](https://github.com/hgrif), [@jrderuiter](https://github.com/jrderuiter), [@NielsZeilemaker](https://github.com/NielsZeilemaker)]
 1. [GovTech GDS](https://gds-gov.tech) [[@chrissng](https://github.com/chrissng) & [@datagovsg](https://github.com/datagovsg)]
 1. [Gradeup](https://gradeup.co) [[@gradeup](https://github.com/gradeup)]
 1. [Grand Rounds](https://www.grandrounds.com/) [[@richddr](https://github.com/richddr), [@timz1290](https://github.com/timz1290), [@wenever](https://github.com/@wenever), & [@runongirlrunon](https://github.com/runongirlrunon)]

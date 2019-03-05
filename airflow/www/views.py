@@ -31,7 +31,6 @@ from datetime import timedelta
 
 
 import markdown
-import nvd3
 import pendulum
 import sqlalchemy as sqla
 from flask import (
@@ -67,6 +66,7 @@ from airflow.utils.db import provide_session
 from airflow.utils.helpers import alchemy_to_dict, render_log_filename
 from airflow.utils.json import json_ser
 from airflow.utils.state import State
+from airflow._vendor import nvd3
 from airflow.www import utils as wwwutils
 from airflow.www.app import app, appbuilder
 from airflow.www.decorators import action_logging, gzipped, has_dag_access
@@ -763,8 +763,8 @@ class Airflow(AirflowBaseView):
         ignore_task_deps = request.args.get('ignore_task_deps') == "true"
         ignore_ti_state = request.args.get('ignore_ti_state') == "true"
 
-        from airflow.executors import GetDefaultExecutor
-        executor = GetDefaultExecutor()
+        from airflow.executors import get_default_executor
+        executor = get_default_executor()
         valid_celery_config = False
         valid_kubernetes_config = False
 
@@ -2117,7 +2117,9 @@ class VariableModelView(AirflowModelView):
             else:
                 d = json.loads(out)
         except Exception:
+            self.update_redirect()
             flash("Missing file or syntax error.", 'error')
+            return redirect(self.get_redirect())
         else:
             suc_count = fail_count = 0
             for k, v in d.items():
@@ -2410,18 +2412,6 @@ class TaskInstanceModelView(AirflowModelView):
         self.set_task_instance_state(tis, State.UP_FOR_RETRY)
         self.update_redirect()
         return redirect(self.get_redirect())
-
-    def get_one(self, id):
-        """
-        As a workaround for AIRFLOW-252, this method overrides Flask-Admin's
-        ModelView.get_one().
-
-        TODO: this method should be removed once the below bug is fixed on
-        Flask-Admin side. https://github.com/flask-admin/flask-admin/issues/1226
-        """
-        task_id, dag_id, execution_date = iterdecode(id)  # noqa
-        execution_date = pendulum.parse(execution_date)
-        return self.session.query(self.model).get((task_id, dag_id, execution_date))
 
 
 class DagModelView(AirflowModelView):

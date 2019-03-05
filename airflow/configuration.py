@@ -169,24 +169,6 @@ class AirflowConfigParser(ConfigParser):
                 "error: cannot use sqlite with the {}".format(
                     self.get('core', 'executor')))
 
-        elif (
-            self.getboolean("webserver", "authenticate") and
-            self.get("webserver", "owner_mode") not in ['user', 'ldapgroup']
-        ):
-            raise AirflowConfigException(
-                "error: owner_mode option should be either "
-                "'user' or 'ldapgroup' when filtering by owner is set")
-
-        elif (
-            self.getboolean("webserver", "authenticate") and
-            self.get("webserver", "owner_mode").lower() == 'ldapgroup' and
-            self.get("webserver", "auth_backend") != (
-                'airflow.contrib.auth.backends.ldap_auth')
-        ):
-            raise AirflowConfigException(
-                "error: attempt at using ldapgroup "
-                "filtering without using the Ldap backend")
-
         self.is_validated = True
 
     def _get_env_var_option(self, section, key):
@@ -383,7 +365,7 @@ class AirflowConfigParser(ConfigParser):
                 opt = self._get_env_var_option(section, key)
             except ValueError:
                 continue
-            if (not display_sensitive and ev != 'AIRFLOW__CORE__UNIT_TEST_MODE'):
+            if not display_sensitive and ev != 'AIRFLOW__CORE__UNIT_TEST_MODE':
                 opt = '< hidden >'
             elif raw:
                 opt = opt.replace('%', '%%')

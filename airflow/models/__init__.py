@@ -24,7 +24,6 @@ from __future__ import unicode_literals
 
 import copy
 from collections import defaultdict, namedtuple, OrderedDict
-
 from builtins import ImportError as BuiltinImportError, bytes, object, str
 from future.standard_library import install_aliases
 
@@ -74,7 +73,7 @@ from croniter import (
 import six
 
 from airflow import settings, utils
-from airflow.executors import GetDefaultExecutor, LocalExecutor
+from airflow.executors import get_default_executor, LocalExecutor
 from airflow import configuration
 from airflow.exceptions import (
     AirflowDagCycleException, AirflowException, AirflowSkipException, AirflowTaskTimeout,
@@ -289,11 +288,12 @@ class DagBag(BaseDagBag, LoggingMixin):
             self,
             dag_folder=None,
             executor=None,
-            include_examples=configuration.conf.getboolean('core', 'LOAD_EXAMPLES')):
+            include_examples=configuration.conf.getboolean('core', 'LOAD_EXAMPLES'),
+            safe_mode=configuration.conf.getboolean('core', 'DAG_DISCOVERY_SAFE_MODE')):
 
         # do not use default arg in signature, to fix import cycle on plugin load
         if executor is None:
-            executor = GetDefaultExecutor()
+            executor = get_default_executor()
         dag_folder = dag_folder or settings.DAGS_FOLDER
         self.log.info("Filling up the DagBag from %s", dag_folder)
         self.dag_folder = dag_folder
@@ -304,7 +304,10 @@ class DagBag(BaseDagBag, LoggingMixin):
         self.import_errors = {}
         self.has_logged = False
 
-        self.collect_dags(dag_folder=dag_folder, include_examples=include_examples)
+        self.collect_dags(
+            dag_folder=dag_folder,
+            include_examples=include_examples,
+            safe_mode=safe_mode)
 
     def size(self):
         """
@@ -539,7 +542,8 @@ class DagBag(BaseDagBag, LoggingMixin):
             self,
             dag_folder=None,
             only_if_updated=True,
-            include_examples=configuration.conf.getboolean('core', 'LOAD_EXAMPLES')):
+            include_examples=configuration.conf.getboolean('core', 'LOAD_EXAMPLES'),
+            safe_mode=configuration.conf.getboolean('core', 'DAG_DISCOVERY_SAFE_MODE')):
         """
         Given a file path or a folder, this method looks for python modules,
         imports them and adds them to the dagbag collection.
@@ -559,11 +563,14 @@ class DagBag(BaseDagBag, LoggingMixin):
         stats = []
         FileLoadStat = namedtuple(
             'FileLoadStat', "file duration dag_num task_num dags")
-        for filepath in list_py_file_paths(dag_folder, include_examples=include_examples):
+
+        for filepath in list_py_file_paths(dag_folder, safe_mode=safe_mode,
+                                           include_examples=include_examples):
             try:
                 ts = timezone.utcnow()
                 found_dags = self.process_file(
-                    filepath, only_if_updated=only_if_updated)
+                    filepath, only_if_updated=only_if_updated,
+                    safe_mode=safe_mode)
 
                 td = timezone.utcnow() - ts
                 td = td.total_seconds() + (
@@ -1718,10 +1725,12 @@ class TaskInstance(Base, LoggingMixin):
     def email_alert(self, exception):
         exception_html = str(exception).replace('\n', '<br>')
         jinja_context = self.get_template_context()
+        # This function is called after changing the state
+        # from State.RUNNING so need to subtract 1 from self.try_number.
         jinja_context.update(dict(
             exception=exception,
             exception_html=exception_html,
-            try_number=self.try_number,
+            try_number=self.try_number - 1,
             max_tries=self.max_tries))
 
         jinja_env = self.task.get_template_env()
@@ -2924,7 +2933,9 @@ class DAG(BaseDag, LoggingMixin):
         new active DAG runs
     :type max_active_runs: int
     :param dagrun_timeout: specify how long a DagRun should be up before
-        timing out / failing, so that new DagRuns can be created
+        timing out / failing, so that new DagRuns can be created. The timeout
+        is only enforced for scheduled DagRuns, and only once the
+        # of active DagRuns == max_active_runs.
     :type dagrun_timeout: datetime.timedelta
     :param sla_miss_callback: specify a function to call when reporting SLA
         timeouts.
@@ -3808,7 +3819,7 @@ class DAG(BaseDag, LoggingMixin):
 
     @provide_session
     def pickle_info(self, session=None):
-        d = {}
+        d = dict()
         d['is_picklable'] = True
         try:
             dttm = timezone.utcnow()
@@ -3929,7 +3940,7 @@ class DAG(BaseDag, LoggingMixin):
         :param local: True to run the tasks using the LocalExecutor
         :type local: bool
         :param executor: The executor instance to run the tasks
-        :type executor: BaseExecutor
+        :type executor: airflow.executor.BaseExecutor
         :param donot_pickle: True to avoid pickling DAG object and send to workers
         :type donot_pickle: bool
         :param ignore_task_deps: True to skip upstream tasks
@@ -3956,7 +3967,7 @@ class DAG(BaseDag, LoggingMixin):
         if not executor and local:
             executor = LocalExecutor()
         elif not executor:
-            executor = GetDefaultExecutor()
+            executor = get_default_executor()
         job = BackfillJob(
             self,
             start_date=start_date,
