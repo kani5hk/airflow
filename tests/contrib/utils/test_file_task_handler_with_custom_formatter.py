@@ -63,11 +63,3 @@ class FileTaskHandlerWithCustomFormatter(unittest.TestCase):
         expected_formatter_value = "dag_for_testing_formatter-task_for_testing_formatter:"+file_handler.formatter._fmt      
         set_context(logger, ti)
         self.assertEqual(expected_formatter_value,file_handler.handler.formatter._fmt)
-
-
-
-        
-
-
-
-
